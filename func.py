@@ -1,9 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Wed Jul 13 13:05:13 2022
-
-@author: ASUS
-"""
 import os
 # This will get us a list of videos from a playlist.
 # Note a page of results has a max value of 50 so we will
