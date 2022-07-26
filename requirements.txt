@@ -2,3 +2,12 @@ seaborn
 google-api-python-client
 plotly
 st_aggrid 
+pandas 
+seaborn 
+matplotlib.pyplot 
+streamlit
+warnings
+googleapiclient
+time
+requests
+matplotlib
