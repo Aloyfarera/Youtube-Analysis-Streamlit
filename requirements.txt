@@ -1,3 +1,4 @@
 seaborn
 google-api-python-client
 plotly
+st_aggrid 
