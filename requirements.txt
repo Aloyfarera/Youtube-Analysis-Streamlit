@@ -11,4 +11,4 @@ warnings
 time
 requests
 matplotlib == 3.4.3
-pip=21.2.4
+pip == 21.2.4
