@@ -1,2 +1,3 @@
 seaborn
 google-api-python-client
+plotly
