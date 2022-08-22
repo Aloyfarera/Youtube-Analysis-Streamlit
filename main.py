@@ -27,7 +27,7 @@ st.write("""
     ### Youtube Channel Analysis 
     """)
 
-youtube = build('youtube', 'v3', developerKey='AIzaSyAwHiDjI46hfBl-ieeMTIeDOL_Qdv2ePrg')
+youtube = build('youtube', 'v3', developerKey=API_KEY)
 
 def get_channel_stats(youtube, channel_id):
     request = youtube.channels().list(
