@@ -14,8 +14,6 @@ from plotly.subplots import make_subplots
 import plotly.graph_objects as go
 from st_aggrid import GridOptionsBuilder, AgGrid, GridUpdateMode, DataReturnMode
 _lock = RendererAgg.lock
-import config
-
 
 
 st.set_page_config(page_title='Youtube Channel Analysis', 
@@ -27,7 +25,7 @@ st.write("""
     ### Youtube Channel Analysis 
     """)
 
-youtube = build('youtube', 'v3', developerKey=API_KEY)
+youtube = build('youtube', 'v3', developerKey='AIzaSyAwHiDjI46hfBl-ieeMTIeDOL_Qdv2ePrg')
 
 def get_channel_stats(youtube, channel_id):
     request = youtube.channels().list(
