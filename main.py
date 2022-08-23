@@ -5,8 +5,7 @@ import streamlit as st
 import warnings
 warnings.simplefilter('ignore')
 from googleapiclient.discovery import build
-import time
-import requests
+import numpy as np
 from matplotlib.backends.backend_agg import RendererAgg
 from func import get_video_list,get_video_details
 import plotly.express as px
@@ -24,7 +23,9 @@ st.set_page_config(page_title='Youtube Channel Analysis',
 st.write("""
     ### Youtube Channel Analysis 
     """)
+#number = st.number_input('Insert a Youtube Channel ID')
 
+#CHANNEL_ID = "UC_eifcIIjgN8Q_8m34nWo3Q"
 youtube = build('youtube', 'v3', developerKey='AIzaSyAwHiDjI46hfBl-ieeMTIeDOL_Qdv2ePrg')
 
 def get_channel_stats(youtube, channel_id):
@@ -36,39 +37,46 @@ def get_channel_stats(youtube, channel_id):
     
     return response['items']
 
-CHANNEL_ID = st.text_area('Insert a Youtube Channel ID',"UC0C-w0YjGpqDXGB8IHb662A")
+CHANNEL_ID = st.text_area('Insert a Youtube Channel ID',"UCHnyfMqiRRG1u-2MsSQLbXA")
 st.write("""
 ##### You can convert channel name to channel ID in this website.
 [[Convert to channel id](https://commentpicker.com/youtube-channel-id.php)]
 """)
 stats = get_channel_stats(youtube,CHANNEL_ID)
-
+#st.write(stats)
 st.write('')
+#row1_space1, row1_1, row1_space2, row1_2, row1_space3, row1_3, row1_space4 = st.columns(
+    #(.15, 3, .3, 8, .1, 7, 0.15))
 
 
-padding1,row1_1, padding2,row1_2,padding3,row1_3,padding4 =st.columns((.15, 1, .3, 2, .00000001, 3, 0.15))
+placeholder = st.empty()
+channel_name= stats[0]['snippet']['title']
+subscribers= int(stats[0]['statistics']['subscriberCount'])
+total_views= int(stats[0]['statistics']['viewCount'])
+total_videos = int(stats[0]['statistics']['videoCount'])
+with placeholder.container():
+        # create three columns
+        st.subheader('Channel Info')
+        kpi1, kpi2, kpi3, kpi4= st.columns(4)
 
-with row1_1, _lock:
+        # fill in those three columns with respective metrics or KPIs 
+        youtube_stats = stats[0]['statistics']
+        dp_channel = stats[0]['snippet']['thumbnails']['high']['url']
+        #url = player_filter['headshot_url'].dropna().iloc[-1]
+        st.image(dp_channel,width=200)
+        kpi1.metric(label="Channel Name ⏳",value= channel_name)
+        kpi2.metric(label="Total Subscibers ⏳",value='{:20,.0f}'.format(subscribers))
+        kpi3.metric(label="Total Views ⏳",value='{:20,.0f}'.format(total_views))
+        kpi4.metric(label="Total Videos⏳",value='{:20,.0f}'.format(total_videos))
 
-    youtube_stats = stats[0]['statistics']
-    dp_channel = stats[0]['snippet']['thumbnails']['high']['url']
-    st.subheader('Channel Info')
-    st.image(dp_channel,width=200)
-    
-
-with row1_2, _lock:
-    st.subheader(' ')
-    st.text(' ')
-    st.text(' ')
-    st.text(f"Channel Name : {stats[0]['snippet']['title']}")
-    st.text(f"Subscribers :{stats[0]['statistics']['subscriberCount']}")
-    st.text(f"Total Views: {stats[0]['statistics']['viewCount']}")
-    st.text( f"Total Videos: {stats[0]['statistics']['videoCount']}")
 subscriberCount = int(stats[0]['statistics']['subscriberCount'])   
+#subscriberCount = int(subscriberCount)
 channel_stats = get_channel_stats(youtube, CHANNEL_ID)
 upload_id = channel_stats[0]['contentDetails']['relatedPlaylists']['uploads']
 video_list = get_video_list(youtube, upload_id)
 video_data = get_video_details(youtube, video_list)
+
+
 
 # save to dataframe
 df=pd.DataFrame(video_data)
@@ -80,6 +88,8 @@ df["like_count"] = pd.to_numeric(df["like_count"])
 df["comment_count"] = pd.to_numeric(df["comment_count"])
 # reaction used later add up likes + dislikes + comments
 df["reactions"] = df["like_count"] + df["comment_count"]
+#df.to_csv("Davie504.csv")
+#df.to_excel("satu_persen.xlsx")
 df['published'] = pd.to_datetime(df['published'], infer_datetime_format=True, errors='coerce')
 df['year'] = pd.to_datetime(df['published']).dt.strftime('%Y')
 df['month'] = pd.to_datetime(df['published']).dt.strftime('%b')
@@ -88,90 +98,89 @@ df['time'] = pd.to_datetime(df['published']).dt.strftime('%H:%M:%S')
 
 start = df.published.min()
 end = df.published.max()
+
+#date_range = st.date_input("Period", [start, end])
 start_date = st.date_input('Start date', start)
 end_date = st.date_input('End date', end)
+#date_r = pd.to_datetime(date_range)
 df1 = df.loc[(df['published'].dt.date >= start_date) & (df['published'].dt.date <= end_date) ]
- 
 
+if  st.checkbox("View Agregated Data"):
+        st.subheader(f'{channel_name} Youtube Aggregated Data')
+        year_grup= df1.groupby('year')['view_count','like_count','comment_count'].agg(["sum","mean","min","max","count"])
+        st.dataframe(year_grup.style.format().highlight_max(color='lightgreen').highlight_min(color='#cd4f39'),width=10000,height=700)
 
-
-gb = GridOptionsBuilder.from_dataframe(df)
-
+gb = GridOptionsBuilder.from_dataframe(df1)
 gb.configure_pagination()
 gb.configure_side_bar()
 gb.configure_default_column(groupable=True, value=True, enableRowGroup=True, aggFunc="sum", editable=True)
 gridOptions = gb.build()
 
-AgGrid(df, gridOptions=gridOptions, enable_enterprise_modules=True)
+AgGrid(df1, gridOptions=gridOptions, enable_enterprise_modules=True)
 
-year_grup_views = df.groupby('year').view_count.agg(["sum","mean","min","max","count","median"])
-year_grup = df.groupby('year').view_count.agg(["sum","mean","min","max","count","median"])
+year_grup_views = df1.groupby('year').view_count.agg(["sum","mean","min","max","count","median"])
+year_grup = df1.groupby('year').view_count.agg(["sum","mean","min","max","count","median"])
+#year_group = df[['view_count','year']]
 
-with row1_3, _lock:
    
-    st.subheader('Video Log')
-    year_grup= df.groupby('year')['view_count','like_count','comment_count'].agg(["sum","mean","min","max","count"])
-    st.dataframe(year_grup.style.format().highlight_max(color='lightgreen').highlight_min(color='#cd4f39'),width=10000,height=700)
+#st.subheader('Video Log')
+#year_grup= df.groupby('year')['view_count','like_count','comment_count'].agg(["sum","mean","min","max","count"])
+#st.dataframe(year_grup.style.format().highlight_max(color='lightgreen').highlight_min(color='#cd4f39'),width=10000,height=700)
 
-row3_1,row3_2 = st.columns((1,1))
-
-with row3_1,_lock:
-    fig = px.bar(year_grup_views, y='sum')
-    fig.update_layout(
-    title='Number of Views per Year', 
-    xaxis = dict(rangeslider = dict(visible=True, thickness=0.05)), 
-    yaxis = dict(), 
+row1,row2 =st.columns(2)
+with row1:
+    fig3 = px.line(year_grup_views, y='sum',markers = True)
+    fig3.update_layout(
+    title='Number Views per Year', 
     paper_bgcolor='#FFFFFF', 
     showlegend=True)
-    
-    st.plotly_chart(fig)
-
-with row3_2,_lock:
-    fig = px.bar(year_grup_views, y='mean')
-    fig.update_layout(
+    st.plotly_chart(fig3)
+with row2:
+    fig2 = px.line(year_grup_views, y='mean',markers = True)
+    fig2.update_layout(
     title='Average Views per Year', 
-    xaxis = dict(rangeslider = dict(visible=True, thickness=0.05)), 
-    yaxis = dict(), 
     paper_bgcolor='#FFFFFF', 
     showlegend=True)
-    
-    st.plotly_chart(fig)
-   
+    st.plotly_chart(fig2)
+
 fig = make_subplots(rows=1, cols=2,specs=[[{"type": "pie"}, {"type": "pie"}]])
 pie_vars = ['Reacters','Neutral'];
 pie_values = [df1['reactions'].sum(),df1['view_count'].sum()-(df1['reactions'].sum())]
-fig.add_trace(go.Pie(values=pie_values, labels=pie_vars),1,1)
+fig.add_trace(go.Pie(values=pie_values, labels=pie_vars,hole=.4),1,1)
 
 pie_vars1 = ['Likers','Commenters'];
 pie_values1 = [df1['like_count'].sum(),df1['comment_count'].sum()]
-fig.add_trace(go.Pie(values=pie_values1, labels=pie_vars1),1,2)
+fig.add_trace(go.Pie(values=pie_values1, labels=pie_vars1,hole=.4),1,2)
 
 fig.update_layout(title_text='People React on Video',height=400, width=1200)
 st.plotly_chart(fig)
 
+#space1,row5_1,space2,row5_2,space3,row5_3,space4 = st.columns((.15, 1.5, .00000001, 1.5, .00000001, 1.5, 0.15))
+#row5_1,row5_2,row5_3=st.columns((1,1,1))
 
 
 fig = make_subplots(rows=1, cols=2)
 bar_vars = ['Views','Subscribers','Likes','Comments']
-bar_values = [df1.describe()['view_count']['mean'],subscriberCount,df.describe()['like_count']['mean'],df.describe()['comment_count']['mean']]
+bar_values = [df1.describe()['view_count']['mean'],subscriberCount,df1.describe()['like_count']['mean'],df1.describe()['comment_count']['mean']]
 fig.add_trace(go.Bar(x=bar_vars, y=bar_values),
               1, 1)
 bar_vars1 = ['Views','Likes','Comments']
-bar_values1 = [df1.describe()['view_count']['mean'],df.describe()['like_count']['mean'],df.describe()['comment_count']['mean']]
+bar_values1 = [df1.describe()['view_count']['mean'],df1.describe()['like_count']['mean'],df1.describe()['comment_count']['mean']]
 fig.add_trace(go.Bar(x=bar_vars1, y=bar_values1),
               1, 2)
 fig.update_layout(
-title='Comparasion',height=400, width=1200)
+title='Subscribers vs Views Vs Likes Vs Comments',height=400, width=1200)
 st.plotly_chart(fig)
 
-
 fig_view = plt.figure(figsize=(10, 4))
+#sns.set(rc={'figure.figsize':(20,10)})
 plot = sns.barplot(x="view_count", y="title", data=df1.nlargest(10, 'view_count'), palette="bright")
 plot.set(xlabel='Views', ylabel='')
 plot.set_title('Most Viewed Videos')
 st.pyplot(fig_view)
 
 fig_like = plt.figure(figsize=(10, 4))
+#sns.set(rc={'figure.figsize':(20,10)})
 plot = sns.barplot(x="like_count", y="title", data=df1.nlargest(10, 'like_count'), palette="bright")
 plot.set(xlabel='Likes', ylabel='')
 plot.set_title('Most Liked Videos')
@@ -182,7 +191,7 @@ st.pyplot(fig_like)
 
 st.write("""
 #### You can find this project on GitHub.
-[[Source Code](https://github.com/Aloyfarera/Youtube-Analysis-Streamlit)]
+[[Model Building](https://github.com/p4v10/Housing-Price-Predicting)]
 """)
 
 
