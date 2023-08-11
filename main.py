@@ -10,6 +10,9 @@ from plotly.subplots import make_subplots
 from streamlit_extras.metric_cards import style_metric_cards
 from markdownlit import mdlit
 import textwrap
+import os
+from dotenv import load_dotenv
+load_dotenv()
 
 st.set_page_config(page_title='Youtube Channel Analysis', 
                    page_icon='chart_with_upwards_trend',
@@ -20,7 +23,8 @@ st.write("""
 #######################################################################################################3
 
 CHANNEL_ID = st.text_input("Enter some Youtube Channel ID 👇", value="UCX6OQ3DkcsbYNE6H8uQQuVA")
-youtube = build('youtube', 'v3', developerKey='AIzaSyAwHiDjI46hfBl-ieeMTIeDOL_Qdv2ePrg')
+developer_key =  os.getenv('YOUTUBE_API_KEY')
+youtube = build('youtube', 'v3', developerKey=developer_key)
 stats = get_channel_stats(youtube,CHANNEL_ID)
 
 
