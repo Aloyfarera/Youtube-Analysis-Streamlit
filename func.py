@@ -1,4 +1,5 @@
 import os
+import streamlit as st
 # This will get us a list of videos from a playlist.
 # Note a page of results has a max value of 50 so we will
 # need to loop over our results with a pageToken
@@ -61,5 +62,16 @@ def get_video_details(youtube, video_list):
 
     return stats_list
 
-#channel_stats = get_channel_stats(youtube, CHANNEL_ID)
-#upload_id = channel_stats[0]['contentDetails']['relatedPlaylists']['uploads']
+def get_channel_stats(youtube, channel_id):
+    request = youtube.channels().list(
+        part="snippet,contentDetails,statistics",
+        id=channel_id
+    )
+    response = request.execute()
+    
+    return response['items']
+
+@st.cache_data
+def convert_df_to_csv(df):
+  # IMPORTANT: Cache the conversion to prevent computation on every rerun
+  return df.to_csv().encode('utf-8')
