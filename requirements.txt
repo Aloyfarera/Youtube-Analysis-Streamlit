@@ -10,3 +10,7 @@ plotly
 seaborn
 numpy
 streamlit-aggrid
+streamlit_elements
+dotenv
+markdownlit
+streamlit_extras
