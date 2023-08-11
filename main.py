@@ -5,10 +5,11 @@ from func import get_video_list,get_video_details,get_channel_stats,convert_df_t
 import streamlit as st
 import plotly.express as px
 from googleapiclient.discovery import build
-from st_aggrid import GridOptionsBuilder, AgGrid, GridUpdateMode, DataReturnMode
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from streamlit_extras.metric_cards import style_metric_cards
+from markdownlit import mdlit
+import textwrap
 
 st.set_page_config(page_title='Youtube Channel Analysis', 
                    page_icon='chart_with_upwards_trend',
@@ -24,11 +25,9 @@ stats = get_channel_stats(youtube,CHANNEL_ID)
 
 
 st.write("""
-##### You can convert channel name to channel ID in this website.
-[[Convert to channel id](https://commentpicker.com/youtube-channel-id.php)]
+[[Convert channel name to channel ID](https://commentpicker.com/youtube-channel-id.php)]
 """)
-
-
+st.warning('This app uses the free YouTube API, which has a daily limit of 10,000 requests', icon="⚠️")
 placeholder = st.empty()
 channel_name= stats[0]['snippet']['title']
 subscribers= int(stats[0]['statistics']['subscriberCount'])
