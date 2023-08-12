@@ -23,7 +23,8 @@ st.write("""
 #######################################################################################################3
 
 CHANNEL_ID = st.text_input("Enter some Youtube Channel ID 👇", value="UCX6OQ3DkcsbYNE6H8uQQuVA")
-developer_key =  os.getenv('YOUTUBE_API_KEY')
+#developer_key =  os.getenv('YOUTUBE_API_KEY')
+developer_key =  st.secrets['YOUTUBE_API_KEY']
 youtube = build('youtube', 'v3', developerKey=developer_key)
 stats = get_channel_stats(youtube,CHANNEL_ID)
 
