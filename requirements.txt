@@ -11,6 +11,6 @@ seaborn
 numpy
 streamlit-aggrid
 streamlit-elements
-dotenv
+python-dotenv
 markdownlit
 streamlit-extras
