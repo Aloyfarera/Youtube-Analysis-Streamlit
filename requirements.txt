@@ -7,7 +7,6 @@ pandas
 matplotlib
 shap
 plotly
-seaborn
 numpy
 streamlit-aggrid
 streamlit-elements
