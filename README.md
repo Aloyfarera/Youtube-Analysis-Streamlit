@@ -6,6 +6,10 @@ Welcome to the YouTube Analysis with Streamlit project! This project is designed
 
 The goal of this project is to provide insights into YouTube data, including information about video views, likes, comments, and more. The analysis is presented in an interactive and user-friendly way using Streamlit.
 
+### Dashboard Screenshot
+
+![Dashboard](dashboard/dashboard_yt_streamlit/your_dashboard_screenshot.png)
+
 ## Data
 
 The dataset used for this project is retrieved from the YouTube Data API using a Google API key. The data includes information about YouTube videos, such as views, likes, comments, and upload dates.
