@@ -8,7 +8,7 @@ The goal of this project is to provide insights into YouTube data, including inf
 
 ### Dashboard Screenshot
 
-![Dashboard](dashboard/dashboard_yt_streamlit/your_dashboard_screenshot.png)
+![Dashboard](dashboard/dashboard_yt_streamlit.png)
 
 ## Data
 
